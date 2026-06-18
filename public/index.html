@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Weather</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Custom Weather</h1>
+      <p class="subtitle">NWS-powered weather for your locations</p>
+    </header>
+    <div id="map"></div>
+    <div id="locations">
+      <div id="loading-state" class="empty-state">
+        <p>Click on the map to add a location</p>
+      </div>
+      <div id="cards"></div>
+    </div>
+  </div>
+
+  <div id="location-dialog" class="dialog-overlay hidden">
+    <div class="dialog">
+      <h3>Add Location</h3>
+      <p id="dialog-coords"></p>
+      <input type="text" id="location-name" placeholder="Location name (e.g. Home, Office)" autocomplete="off" />
+      <div class="dialog-actions">
+        <button id="dialog-cancel" class="btn btn-secondary">Cancel</button>
+        <button id="dialog-confirm" class="btn btn-primary">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
