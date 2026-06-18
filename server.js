@@ -195,8 +195,8 @@ app.get('/api/weather/:lat/:lon', async (req, res) => {
     }
 
     const [gridData, stationsData] = await Promise.all([
-      nwsFetch(`/gridpoints/${gridId}/${gridX}/${gridY}/forecast/gridpoints`),
-      nwsFetch(`/gridpoints/${gridId}/${gridX}/${gridY}/stations`)
+      nwsFetch(props.forecastGridData.replace(NWS_BASE, '')),
+      nwsFetch(`/gridpoints/${gridId}/${gridX},${gridY}/stations`)
     ]);
 
     const forecast = processForecast(gridData);
