@@ -66,8 +66,9 @@ function processForecast(gridData) {
   const minTemps = (p.minTemperature?.values || []).map(v => ({ date: getDate(v.validTime), v: cToF(v.value) }));
   const sky = (p.skyCover?.values || []).map(v => ({ date: getDate(v.validTime), v: v.value }));
   const precip = (p.quantitativePrecipitation?.values || []).map(v => ({ date: getDate(v.validTime), v: v.value }));
+  const humidity = (p.relativeHumidity?.values || []).map(v => ({ date: getDate(v.validTime), v: v.value }));
 
-  const dates = new Set([...maxTemps, ...minTemps, ...sky, ...precip].map(d => d.date));
+  const dates = new Set([...maxTemps, ...minTemps, ...sky, ...precip, ...humidity].map(d => d.date));
   const today = new Date().toISOString().split('T')[0];
 
   const result = [];
@@ -77,13 +78,15 @@ function processForecast(gridData) {
     const lowArr = minTemps.filter(d => d.date === date).map(d => d.v).filter(v => v !== null);
     const skyArr = sky.filter(d => d.date === date).map(d => d.v).filter(v => v !== null);
     const precipArr = precip.filter(d => d.date === date).map(d => d.v).filter(v => v !== null && v > 0);
+    const humidArr = humidity.filter(d => d.date === date).map(d => d.v).filter(v => v !== null);
 
     result.push({
       date,
       high: highArr.length > 0 ? Math.max(...highArr) : null,
       low: lowArr.length > 0 ? Math.min(...lowArr) : null,
       skyCover: skyArr.length > 0 ? Math.round(skyArr.reduce((a, b) => a + b, 0) / skyArr.length) : null,
-      precipitation: precipArr.length > 0 ? mmToIn(precipArr.reduce((a, b) => a + b, 0)) : 0
+      precipitation: precipArr.length > 0 ? mmToIn(precipArr.reduce((a, b) => a + b, 0)) : 0,
+      humidity: humidArr.length > 0 ? Math.round(humidArr.reduce((a, b) => a + b, 0) / humidArr.length) : null
     });
   }
 
@@ -96,7 +99,7 @@ function processHistory(observations) {
   for (const obs of observations) {
     const p = obs.properties;
     const date = getDate(p.timestamp);
-    if (!byDate[date]) byDate[date] = { date, high: [], low: [], skyCovers: [], precip: 0 };
+    if (!byDate[date]) byDate[date] = { date, high: [], low: [], skyCovers: [], precip: 0, humidities: [] };
 
     const day = byDate[date];
     const temp = p.temperature?.value;
@@ -109,6 +112,9 @@ function processHistory(observations) {
     }
     if (p.minTemperatureLast24Hours?.value !== null && p.minTemperatureLast24Hours?.value !== undefined) {
       day.low.push(cToF(p.minTemperatureLast24Hours.value));
+    }
+    if (p.relativeHumidity?.value !== null && p.relativeHumidity?.value !== undefined) {
+      day.humidities.push(p.relativeHumidity.value);
     }
     if (p.cloudLayers?.length > 0) {
       const maxCov = Math.max(...p.cloudLayers.map(l => CLOUD_MAP[l.amount] || 0));
@@ -134,7 +140,8 @@ function processHistory(observations) {
       high: d.high.length > 0 ? Math.round(Math.max(...d.high)) : null,
       low: d.low.length > 0 ? Math.round(Math.min(...d.low)) : null,
       skyCover: d.skyCovers.length > 0 ? Math.round(d.skyCovers.reduce((a, b) => a + b, 0) / d.skyCovers.length) : null,
-      precipitation: d.precip > 0 ? mmToIn(d.precip) : 0
+      precipitation: d.precip > 0 ? mmToIn(d.precip) : 0,
+      humidity: d.humidities.length > 0 ? Math.round(d.humidities.reduce((a, b) => a + b, 0) / d.humidities.length) : null
     }));
 }
 

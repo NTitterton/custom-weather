@@ -63,12 +63,8 @@ function closeDialog() {
 function updateMapHeight() {
   const hasCards = document.getElementById('cards').children.length > 0;
   const mapEl = document.getElementById('map');
-  if (hasCards) {
-    mapEl.classList.remove('map-expanded');
-  } else {
-    mapEl.classList.add('map-expanded');
-  }
-  if (map) map.invalidateSize();
+  mapEl.classList.toggle('map-compact', hasCards);
+  if (map) setTimeout(() => map.invalidateSize(), 50);
 }
 
 async function confirmAddLocation() {
@@ -84,6 +80,7 @@ async function confirmAddLocation() {
     if (!res.ok) throw new Error('Failed to save location');
     const loc = await res.json();
     closeDialog();
+    document.getElementById('loading-state').classList.add('hidden');
     addMarker(loc);
     renderLocationCard(loc);
   } catch (err) {
@@ -168,10 +165,12 @@ function buildWeatherHTML(data) {
     const precip = d && d.precipitation !== null && d.precipitation !== undefined
       ? (d.precipitation > 0 ? `${d.precipitation.toFixed(2)}"` : `0"`)
       : noData;
+    const humid = d && d.humidity !== null ? `${d.humidity}%` : noData;
     return `<tr>
       <td class="date">${dateStr}</td>
       <td class="high">${high}</td>
       <td class="low">${low}</td>
+      <td class="humidity">${humid}</td>
       <td class="cloud">${cloud}</td>
       <td class="precip">${precip}</td>
     </tr>`;
@@ -187,19 +186,19 @@ function buildWeatherHTML(data) {
 
   let html = '<div class="weather-tables">';
 
-  html += '<div class="table-section"><h4>Previous 5 Days</h4><table><thead><tr><th>Date</th><th>High</th><th>Low</th><th>Cloud</th><th>Precip</th></tr></thead><tbody>';
+  html += '<div class="table-section"><h4>Previous 5 Days</h4><table><thead><tr><th>Date</th><th>High</th><th>Low</th><th>Hum</th><th>Cloud</th><th>Precip</th></tr></thead><tbody>';
   if (hasHistory) {
     for (const d of data.history) html += row(d);
   } else {
-    html += `<tr><td colspan="5" style="text-align:center;color:#475569;">No historical data</td></tr>`;
+    html += `<tr><td colspan="6" style="text-align:center;color:#475569;">No historical data</td></tr>`;
   }
   html += '</tbody></table></div>';
 
-  html += '<div class="table-section"><h4>Next 5 Days</h4><table><thead><tr><th>Date</th><th>High</th><th>Low</th><th>Cloud</th><th>Precip</th></tr></thead><tbody>';
+  html += '<div class="table-section"><h4>Next 5 Days</h4><table><thead><tr><th>Date</th><th>High</th><th>Low</th><th>Hum</th><th>Cloud</th><th>Precip</th></tr></thead><tbody>';
   if (hasForecast) {
     for (const d of data.forecast) html += row(d);
   } else {
-    html += `<tr><td colspan="5" style="text-align:center;color:#475569;">No forecast data</td></tr>`;
+    html += `<tr><td colspan="6" style="text-align:center;color:#475569;">No forecast data</td></tr>`;
   }
   html += '</tbody></table></div>';
 

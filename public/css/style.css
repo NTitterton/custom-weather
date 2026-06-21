@@ -34,16 +34,17 @@ h1 {
 }
 
 #map {
-  height: 320px;
+  height: 60vh;
+  min-height: 320px;
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #1e293b;
   margin-bottom: 20px;
-  transition: height 0.3s ease;
 }
 
-#map.map-expanded {
-  height: 60vh;
+#map.map-compact {
+  height: 320px;
+  min-height: 320px;
 }
 
 .leaflet-container {
@@ -185,6 +186,10 @@ td.cloud {
 
 td.precip {
   color: #34d399;
+}
+
+td.humidity {
+  color: #67e8f9;
 }
 
 td .na {
