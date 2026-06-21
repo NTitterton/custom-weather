@@ -2,6 +2,7 @@ let map;
 let markers = {};
 let dialogLat = null;
 let dialogLon = null;
+let clickTimer = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   initMap();
@@ -37,18 +38,37 @@ function initMap() {
 }
 
 function onMapClick(e) {
-  dialogLat = e.latlng.lat.toFixed(4);
-  dialogLon = e.latlng.lng.toFixed(4);
-  document.getElementById('dialog-coords').textContent = `Lat: ${dialogLat}, Lon: ${dialogLon}`;
-  document.getElementById('location-name').value = '';
-  document.getElementById('location-dialog').classList.remove('hidden');
-  setTimeout(() => document.getElementById('location-name').focus(), 100);
+  if (clickTimer) {
+    clearTimeout(clickTimer);
+    clickTimer = null;
+    return;
+  }
+  clickTimer = setTimeout(() => {
+    clickTimer = null;
+    dialogLat = e.latlng.lat.toFixed(4);
+    dialogLon = e.latlng.lng.toFixed(4);
+    document.getElementById('dialog-coords').textContent = `Lat: ${dialogLat}, Lon: ${dialogLon}`;
+    document.getElementById('location-name').value = '';
+    document.getElementById('location-dialog').classList.remove('hidden');
+    setTimeout(() => document.getElementById('location-name').focus(), 100);
+  }, 280);
 }
 
 function closeDialog() {
   document.getElementById('location-dialog').classList.add('hidden');
   dialogLat = null;
   dialogLon = null;
+}
+
+function updateMapHeight() {
+  const hasCards = document.getElementById('cards').children.length > 0;
+  const mapEl = document.getElementById('map');
+  if (hasCards) {
+    mapEl.classList.remove('map-expanded');
+  } else {
+    mapEl.classList.add('map-expanded');
+  }
+  if (map) map.invalidateSize();
 }
 
 async function confirmAddLocation() {
@@ -81,6 +101,7 @@ async function loadLocations() {
       addMarker(loc);
       renderLocationCard(loc);
     }
+    updateMapHeight();
   } catch (err) {
     document.getElementById('loading-state').innerHTML = `<p class="card-error">Failed to load locations: ${err.message}</p>`;
   }
@@ -114,6 +135,7 @@ async function renderLocationCard(loc) {
     </div>
   `;
   cards.appendChild(card);
+  updateMapHeight();
 
   fetchWeather(loc);
 }
@@ -194,6 +216,7 @@ async function removeLocation(id) {
       map.removeLayer(markers[id]);
       delete markers[id];
     }
+    updateMapHeight();
     if (document.getElementById('cards').children.length === 0) {
       document.getElementById('loading-state').classList.remove('hidden');
       document.getElementById('loading-state').innerHTML = '<p>Click on the map to add a location</p>';

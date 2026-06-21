@@ -39,6 +39,11 @@ h1 {
   overflow: hidden;
   border: 1px solid #1e293b;
   margin-bottom: 20px;
+  transition: height 0.3s ease;
+}
+
+#map.map-expanded {
+  height: 60vh;
 }
 
 .leaflet-container {
