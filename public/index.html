@@ -24,7 +24,10 @@
 
   <div id="location-dialog" class="dialog-overlay hidden">
     <div class="dialog">
-      <h3>Add Location</h3>
+      <div class="dialog-header">
+        <h3>Add Location</h3>
+        <button id="dialog-close" class="dialog-close" aria-label="Close">&times;</button>
+      </div>
       <p id="dialog-coords"></p>
       <input type="text" id="location-name" placeholder="Location name (e.g. Home, Office)" autocomplete="off" />
       <div class="dialog-actions">

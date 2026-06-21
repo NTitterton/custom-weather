@@ -8,10 +8,16 @@ document.addEventListener('DOMContentLoaded', () => {
   loadLocations();
 
   document.getElementById('dialog-cancel').addEventListener('click', closeDialog);
+  document.getElementById('dialog-close').addEventListener('click', closeDialog);
   document.getElementById('dialog-confirm').addEventListener('click', confirmAddLocation);
+  document.getElementById('location-dialog').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeDialog();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeDialog();
+  });
   document.getElementById('location-name').addEventListener('keydown', e => {
     if (e.key === 'Enter') confirmAddLocation();
-    if (e.key === 'Escape') closeDialog();
   });
 });
 
