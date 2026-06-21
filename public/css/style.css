@@ -221,6 +221,8 @@ td .na {
   color: white;
 }
 
+.hidden { display: none !important; }
+
 .dialog-overlay {
   position: fixed;
   inset: 0;
